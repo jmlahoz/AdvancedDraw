@@ -199,7 +199,7 @@ One mark bottom... 5000 no yes no 5
 ##{ Mark f0 with line
 if display_f0
 One mark bottom... 'fh1:0' no no yes 
-f0$ = "f_0 = 'fh1:0' Hz"
+f0$ = "%f_0 = 'fh1:0' Hz"
 xcoord = 'fh1' + 20
 Text special... 'xcoord' right 78 top Times 10 90 'f0$'
 endif
@@ -274,10 +274,12 @@ endif
 ##}
 
 ##{ Clean and restore workspace
-select socopy
-plus slice_harmonics
+select slice_harmonics
 nocheck plus lpc
+nocheck plus socopy
 Remove
 
 @restorews
 ##}
+
+editor 'data_type$' 'data_name$'
