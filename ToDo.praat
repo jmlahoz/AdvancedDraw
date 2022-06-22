@@ -1,1 +1,0 @@
-Unificar versión so y tg de Draw elements

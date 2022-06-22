@@ -1,6 +1,6 @@
 # Draw elements
 # José María Lahoz-Bengoechea (jmlahoz@ucm.es)
-# Version 2022-06-19
+# Version 2022-06-22
 
 # LICENSE
 # (C) 2022 José María Lahoz-Bengoechea
@@ -20,6 +20,8 @@
 
 # This script draws spectrogram, formants, pitch and/or intensity,
 # as well as the selection within the window and the TextGrid with its tier names.
+# Do not click on the picture window before you save the figure,
+# since it cannot be selected manually at the proper margins.
 
 # This is an Editor script.
 
@@ -37,13 +39,13 @@ spectro_floor = extractNumber(editorinfo$,"Spectrogram view from: ")
 spectro_ceiling = extractNumber(editorinfo$,"Spectrogram view to: ")
 pitch_floor = extractNumber(editorinfo$,"Pitch floor: ")
 pitch_ceiling = extractNumber(editorinfo$,"Pitch ceiling: ")
-intensity_floor = extractNumber(editorinfo$,"Intensity view from: ")
-intensity_ceiling = extractNumber(editorinfo$,"Intensity view to: ")
 
 endeditor
 
 beginPause: "Draw elements..."
 boolean: "erase_first", 1
+real: "figure_width", 7
+natural: "font_size", 14
 optionMenu: "write_name_at_top", 1
 option: "no"
 option: "far"
@@ -52,19 +54,13 @@ comment: "Customized name (else, default window title):"
 text: "customized_name", ""
 boolean: "draw_spectrogram", 1
 boolean: "draw_formants", 0
-optionMenu: "formant_legend", 1
+optionMenu: "formant_legend", 2
 option: "none"
 option: "left"
 option: "only dotted lines"
 option: "left & dotted lines"
 boolean: "draw_pitch", 0
-optionMenu: "pitch_legend", 1
-option: "none"
-option: "left"
-option: "left & dotted lines"
-option: "right"
-boolean: "draw_intensity", 0
-optionMenu: "intensity_legend", 1
+optionMenu: "pitch_legend", 4
 option: "none"
 option: "left"
 option: "left & dotted lines"
@@ -74,24 +70,10 @@ boolean: "draw_textgrid", 1
 boolean: "draw_tier_names", 1
 endif
 comment: ""
-boolean: "draw_window_times", 0
+boolean: "draw_window_times", 1
 boolean: "draw_selection_hairs", 0
 boolean: "draw_selection_times", 0
 clicked = endPause: "OK", 1
-
-if data_type$ = "TextGrid"
-if draw_textgrid
-beginPause: "Set figure size..."
-comment: "Set the size of the spectrogram / the melody curve."
-comment: "The TextGrid (if any) will be automatically added below."
-comment: "Range is given in inches."
-real: "left_horizontal_range", 0
-real: "right_horizontal_range", 8
-real: "left_vertical_range", 0
-real: "right_vertical_range", 3
-clicked2 = endPause: "OK", 1
-endif
-endif
 
 @getws
 
@@ -99,13 +81,10 @@ if erase_first
 Erase all
 endif
 
-Font size... 14
+Font size... 'font_size'
+font_size2 = font_size*(6/7)
 
-if data_type$ = "TextGrid"
-if draw_textgrid
-Select outer viewport: left_horizontal_range, right_horizontal_range, left_vertical_range, right_vertical_range
-endif
-endif
+Select inner viewport: 0.5, 0.5+figure_width, 0.5, 2.5
 
 if draw_spectrogram
 Black
@@ -131,14 +110,6 @@ Draw visible pitch contour... no no no no no no
 endeditor
 endif
 
-if draw_intensity
-Yellow
-Line width... 2
-editor 'data_type$' 'data_name$'
-Draw visible intensity contour... no no no no no
-endeditor
-endif
-
 Black
 Line width... 0.5
 Draw inner box
@@ -156,92 +127,82 @@ endif
 endif
 
 if draw_window_times
-Axes... 'w_ini' 'w_end' 0 5000
+Axes... 0 1 0 1
 Black
-Text special... 'w_ini' left -250 half Times 12 0 'w_ini:3'
-Text special... 'w_end' right -250 half Times 12 0 'w_end:3'
-Text special... 'w_mid' centre -800 half Times 12 0 Time (s)
+Text special... 0 left -0.01 top Times 'font_size2' 0 'w_ini:3'
+Text special... 1 right -0.01 top Times 'font_size2' 0 'w_end:3'
+Text special... 0.5 centre -0.01 top Times 'font_size2' 0 Time (s)
 endif
 
 if draw_selection_hairs
-Axes... 'w_ini' 'w_end' 0 5000
+Axes... 'w_ini' 'w_end' 0 1
 Black
 Line width... 0.5
 Dotted line
-Draw line... 'sel_ini' 0 'sel_ini' 5000
-Draw line... 'sel_end' 0 'sel_end' 5000
+Draw line... 'sel_ini' 0 'sel_ini' 1
+Draw line... 'sel_end' 0 'sel_end' 1
 Solid line
 endif
 
 if draw_selection_times
-Axes... 'w_ini' 'w_end' 0 5000
+Axes... 'w_ini' 'w_end' 0 1
 Black
-Text special... 'sel_ini' centre -250 half Times 12 0 'sel_ini:3'
-Text special... 'sel_end' centre -250 half Times 12 0 'sel_end:3'
+Text special... 'sel_ini' centre -0.01 top Times 'font_size2' 0 'sel_ini:3'
+Text special... 'sel_end' centre -0.01 top Times 'font_size2' 0 'sel_end:3'
 if draw_window_times != 1
-Text special... 'w_mid' centre -800 half Times 12 0 Time (s)
+Text special... 'w_mid' centre -0.01 top Times 'font_size2' 0 Time (s)
 endif
 endif
 
 if (draw_spectrogram || draw_formants) and formant_legend != 1
-Axes... 'w_ini' 'w_end' 'spectro_floor' 'spectro_ceiling'
+Axes... 0 1 0 1
 if formant_legend = 2 or formant_legend = 4
-One mark left... 'spectro_floor' yes no no
-One mark left... 'spectro_ceiling' yes no no
-Axes... 0.58 5.41 2.11 0.38
-Text special... -0.07 left 0.25 half Times 12 0 Spectrum (Hz)
-Axes... 'w_ini' 'w_end' 'spectro_floor' 'spectro_ceiling'
+Text special... -0.01 right 0 half Times 'font_size2' 0 'spectro_floor'
+Text special... -0.01 right 1 half Times 'font_size2' 0 'spectro_ceiling'
+Text special... -0.025 right 0.725 half Times 'font_size2' 90 Spectrum (Hz)
 endif
 if formant_legend = 3 or formant_legend = 4
-Marks left every... 1 1000 no no yes
-Axes... 0.58 5.41 'spectro_floor' 'spectro_ceiling'
+nkhz = floor('spectro_ceiling'/1000)
+heightperkhz = 1/nkhz
+Marks left every... 1 heightperkhz no no yes
 Magenta
-Text special... 0.60 left 1000 bottom Times 12 0 1kHz
-Text special... 0.60 left 2000 bottom Times 12 0 2kHz
-Text special... 0.60 left 3000 bottom Times 12 0 3kHz
-Text special... 0.60 left 4000 bottom Times 12 0 4kHz
+for ikhz from 1 to nkhz-1
+khz$ = string$(ikhz)+"kHz"
+Text special... 0.01 left ikhz*heightperkhz bottom Times 'font_size2' 0 'khz$'
+endfor
 Black
-Axes... 'w_ini' 'w_end' 'spectro_floor' 'spectro_ceiling'
 endif
 endif
 
 if draw_pitch and pitch_legend != 1
-Axes... 'w_ini' 'w_end' 'pitch_floor' 'pitch_ceiling'
+Axes... 0 1 0 1
 if pitch_legend = 2 or pitch_legend = 3
-One mark left... 'pitch_floor' yes no no 
-One mark left... 'pitch_ceiling' yes no no 
-Axes... 0.58 5.41 2.11 0.38
-Text special... 0.05 left 0.25 half Times 12 0 Pitch (Hz)
-Axes... 'w_ini' 'w_end' 'pitch_floor' 'pitch_ceiling'
+Text special... -0.01 right 0 half Times 'font_size2' 0 'pitch_floor'
+Text special... -0.01 right 1 half Times 'font_size2' 0 'pitch_ceiling'
+Text special... -0.025 right 0.65 half Times 'font_size2' 90 Pitch (Hz)
 if pitch_legend = 3
+Axes... 0 1 'pitch_floor' 'pitch_ceiling'
 Marks left every... 1 50 no no yes
+pitch_bottom = (ceiling(pitch_floor/50))*50
+if pitch_bottom = pitch_floor
+pitch_bottom = pitch_bottom+50
+endif
+pitch_top = (floor(pitch_ceiling/50))*50
+if pitch_top = pitch_ceiling
+pitch_top = pitch_top-50
+endif
+Blue
+for ipitchline from pitch_bottom/50 to pitch_top/50
+pitch$ = string$((ipitchline*50))+" Hz"
+Text special... 0.01 left ipitchline*50 bottom Times 'font_size2' 0 'pitch$'
+endfor
+Black
+Axes... 0 1 0 1
 endif
 elsif pitch_legend = 4
-One mark right... 'pitch_floor' yes no no 
-One mark right... 'pitch_ceiling' yes no no 
-Axes... 0.58 5.41 2.11 0.38
-Text special... 5.97 right 0.25 half Times 12 0 Pitch (Hz)
-Axes... 'w_ini' 'w_end' 'pitch_floor' 'pitch_ceiling'
-endif
-endif
-
-if draw_intensity and intensity_legend != 1
-Axes... 'w_ini' 'w_end' 'intensity_floor' 'intensity_ceiling'
-if intensity_legend = 2 or intensity_legend = 3
-One mark left... 'intensity_floor' yes no no 
-One mark left... 'intensity_ceiling' yes no no 
-Axes... 0.58 5.41 2.11 0.38
-Text special... 0.09 left 0.25 half Times 12 0 Intensity (dB)
-Axes... 'w_ini' 'w_end' 'intensity_floor' 'intensity_ceiling'
-if intensity_legend = 3
-Marks left every... 1 10 no no yes
-endif
-elsif intensity_legend = 4
-One mark right... 'intensity_floor' yes no no 
-One mark right... 'intensity_ceiling' yes no no 
-Axes... 0.58 5.41 2.11 0.38
-Text special... 5.97 right 0.25 half Times 12 0 Intensity (dB)
-Axes... 'w_ini' 'w_end' 'intensity_floor' 'intensity_ceiling'
+Text special... 1.01 left 0 half Times 'font_size2' 0 'pitch_floor'
+Text special... 1.01 left 1 half Times 'font_size2' 0 'pitch_ceiling'
+Text special... 1.025 left 0.65 half Times 'font_size2' 270 Pitch (Hz)
 endif
 endif
 
@@ -249,8 +210,10 @@ if data_type$ = "TextGrid"
 if draw_textgrid
 @selobj: 0, 1
 ntier = Get number of tiers
-outer_inch = 'right_vertical_range' + (0.5*'ntier') + 'right_vertical_range'/3
-Select outer viewport: left_horizontal_range, right_horizontal_range, left_vertical_range, outer_inch
+tg_bottom = 3 + ((2/3)*'ntier')
+# The factor (2/3) yields a fairly constant height for tiers regardless the number of tiers.
+# The space between the sound and the TextGrid is also the same height as one tier.
+Select inner viewport: 0.5, 0.5+figure_width, 0.5, tg_bottom
 Black
 Line width... 1
 editor 'data_type$' 'data_name$'
@@ -261,16 +224,19 @@ endif
 
 if data_type$ = "TextGrid"
 if draw_tier_names and draw_textgrid
-Select outer viewport: left_horizontal_range, right_horizontal_range, right_vertical_range-0.5, outer_inch
+Select inner viewport: 0.5, 0.5+figure_width, 2.5, tg_bottom
 Axes... 0 1 0 1
-# tier_width = (('outer_inch' - 3/8) - 2.25)/'ntier'
 @selobj: 0, 1
 for itier from 1 to ntier
 tier_name$ = Get tier name... 'ntier'-'itier'+1
-Text special... 1.01 left ((1/ntier)*(itier-1)+(1/(2*ntier))) half Times 10 0 'tier_name$'
-# Text special... 5.45 left (2.25+('tier_width'/2)+(('itier'-1)*'tier_width')) half Times 8 0 'tier_name$'
+Text special... 1.01 left ((2*'itier'-1)/(2*'ntier'+2)) half Times 'font_size2' 0 'tier_name$'
+# Given the axes, the range 0-1 encompasses all tiers and the space between the sound and the TextGrid,
+# so each tier height = 1/(ntier+1).
+# The bottommost tier label is at half the first tier height: (1/(ntier+1))/2 = 1/(2*ntier+2).
+# Each increment is (itier-1)*(1/(ntier+1)) = (itier-1)/(ntier+1) = 2*(itier-1)/2*(ntier+1) = (2*itier-2)/(2*ntier+2).
+# If we add the starting point plus the increment, (1 + 2*itier-2))/(2*ntier+2) = (2*itier-1)/(2*ntier+2).
 endfor
-Select outer viewport: 'left_horizontal_range', 'right_horizontal_range', 'left_vertical_range', 'outer_inch'
+Select inner viewport: 0.5, 0.5+figure_width, 0.5, tg_bottom
 endif
 endif
 
