@@ -23,7 +23,7 @@
 
 # This is an Editor script.
 
-include utils.praat
+include auxiliary.praat
 
 form Draw harmonics & envelope...
 choice sex 1
@@ -60,10 +60,6 @@ ini = Get start of selection
 end = Get end of selection
 t = (ini+end)/2
 
-@getinfo: 0
-endeditor
-@getws
-editor 'data_type$' 'data_name$'
 @getinfo: 1
 
 ##{ Create object for harmonics (spectral slice)
@@ -142,7 +138,7 @@ ff2 = spectral_analysis.ff2
 ff3 = spectral_analysis.ff3
 ##}
 
-##{ Clean workspace (so far)
+##{ Clean workspace
 select pitch
 plus pulses
 plus fn

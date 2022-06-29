@@ -25,7 +25,7 @@
 
 # This is an Editor script.
 
-include utils.praat
+include auxiliary.praat
 
 @getinfo: 0
 
@@ -74,8 +74,6 @@ boolean: "draw_window_times", 1
 boolean: "draw_selection_hairs", 0
 boolean: "draw_selection_times", 0
 clicked = endPause: "OK", 1
-
-@getws
 
 if erase_first
 Erase all
