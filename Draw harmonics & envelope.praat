@@ -1,6 +1,6 @@
 # Draw harmonics & envelope
 # José María Lahoz-Bengoechea (jmlahoz@ucm.es)
-# Version 2022-06-19
+# Version 2022-07-01
 
 # LICENSE
 # (C) 2022 José María Lahoz-Bengoechea
