@@ -48,12 +48,6 @@ option no
 option yes
 endform
 
-if nasal_context = 1
-nasalctxt$ = "no"
-else
-nasalctxt$ = "yes"
-endif
-
 @parsex: 'sex', 1
 
 ini = Get start of selection
@@ -96,26 +90,7 @@ pulses = noprogress To PointProcess (periodic, cc)... 'pitch_floor' 'pitch_ceili
 @selobj: 1, 0
 @toaltfn
 select fn
-f1 = Get value at time... 1 t hertz Linear
-f2 = Get value at time... 2 t hertz Linear
-f3 = Get value at time... 3 t hertz Linear
-if segment_id$ = "" and nasalctxt$ = "no"
-b1 = Get bandwidth at time... 1 t hertz Linear
-b2 = Get bandwidth at time... 2 t hertz Linear
-b3 = Get bandwidth at time... 3 t hertz Linear
-else
-@resetfnflags
-@fn_check: 'f1', 1, 't', segment_id$, nasalctxt$, ""
-f1 = fn_check.resultfn
-b1 = fn_check.resultbn
-@fn_check: 'f2', 2, 't', segment_id$, nasalctxt$, ""
-f2 = fn_check.resultfn
-b2 = fn_check.resultbn
-@fn_check: 'f3', 3, 't', segment_id$, nasalctxt$, "'f2'"
-f3 = fn_check.resultfn
-b3 = fn_check.resultbn
-@resetfnflags
-endif
+@getformants: t, segment_id$, nasal_context$
 ##}
 
 ##{ Get amplitude and frequency of relevant harmonics
