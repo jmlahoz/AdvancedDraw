@@ -13,8 +13,14 @@
 # This file runs on Praat, a software developed by Paul Boersma
 # and David Weenink at University of Amsterdam.
 
+if praatVersion >= 6215
+spectrum_menu$ = "Spectrogram"
+else
+spectrum_menu$ = "Spectrum"
+endif
+
 Add menu command... "SoundEditor" "File" "Draw elements..." "" 0 Draw elements.praat
 Add menu command... "TextGridEditor" "File" "Draw elements..." "" 0 Draw elements.praat
-Add menu command... "SoundEditor" "Spectrum" "Draw harmonics & envelope..." "" 0 Draw harmonics & envelope.praat
-Add menu command... "TextGridEditor" "Spectrum" "Draw harmonics & envelope..." "" 0 Draw harmonics & envelope.praat
+Add menu command... "SoundEditor" "'spectrum_menu$'" "Draw harmonics & envelope..." "" 0 Draw harmonics & envelope.praat
+Add menu command... "TextGridEditor" "'spectrum_menu$'" "Draw harmonics & envelope..." "" 0 Draw harmonics & envelope.praat
 
