@@ -253,4 +253,4 @@ Remove
 @restorews
 ##}
 
-editor 'data_type$' 'data_name$'
+# editor 'data_type$' 'data_name$'
